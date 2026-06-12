@@ -1,17 +1,17 @@
 :root {
-  color-scheme: dark;
-  --bg: #0b1020;
-  --bg-soft: #111832;
-  --card: rgba(20, 29, 57, 0.82);
-  --card-strong: rgba(29, 41, 81, 0.92);
-  --text: #f7f8ff;
-  --muted: #a9b4d0;
-  --accent: #7c5cff;
-  --accent-2: #26d9c5;
-  --danger: #ff5277;
-  --warning-bg: rgba(255, 82, 119, 0.13);
-  --border: rgba(255, 255, 255, 0.12);
-  --shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+  color-scheme: light;
+  --bg: #f5f7fb;
+  --bg-soft: #eef3f8;
+  --card: rgba(255, 255, 255, 0.94);
+  --card-strong: #f8fafc;
+  --text: #172033;
+  --muted: #637083;
+  --accent: #2563eb;
+  --accent-2: #0f766e;
+  --danger: #dc2626;
+  --warning-bg: #fef2f2;
+  --border: #d8e0ea;
+  --shadow: 0 22px 60px rgba(32, 45, 72, 0.12);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
@@ -24,9 +24,9 @@ body {
   margin: 0;
   color: var(--text);
   background:
-    radial-gradient(circle at top left, rgba(124, 92, 255, 0.38), transparent 34rem),
-    radial-gradient(circle at 80% 20%, rgba(38, 217, 197, 0.24), transparent 28rem),
-    linear-gradient(135deg, #080b17 0%, var(--bg) 55%, #12172a 100%);
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 32rem),
+    radial-gradient(circle at 86% 16%, rgba(15, 118, 110, 0.1), transparent 30rem),
+    linear-gradient(135deg, #ffffff 0%, var(--bg) 58%, #eef3f8 100%);
 }
 
 button,
@@ -68,17 +68,17 @@ p {
 h1 {
   max-width: 780px;
   margin-bottom: 16px;
-  font-size: clamp(2.4rem, 7vw, 5.2rem);
-  line-height: 0.92;
-  letter-spacing: -0.07em;
+  font-size: clamp(2.2rem, 5vw, 3.9rem);
+  line-height: 1.04;
+  letter-spacing: -0.045em;
 }
 
 .lead {
   max-width: 720px;
   margin-bottom: 0;
   color: var(--muted);
-  font-size: 1.08rem;
-  line-height: 1.7;
+  font-size: 1.05rem;
+  line-height: 1.65;
 }
 
 .status-card,
@@ -87,7 +87,7 @@ h1 {
   border: 1px solid var(--border);
   background: var(--card);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(14px);
 }
 
 .status-card {
@@ -96,7 +96,7 @@ h1 {
   align-items: center;
   min-height: 116px;
   padding: 22px;
-  border-radius: 28px;
+  border-radius: 22px;
 }
 
 .pulse {
@@ -104,13 +104,13 @@ h1 {
   height: 18px;
   border-radius: 999px;
   background: var(--accent-2);
-  box-shadow: 0 0 0 12px rgba(38, 217, 197, 0.12);
+  box-shadow: 0 0 0 10px rgba(15, 118, 110, 0.12);
 }
 
 .pulse.recording {
   background: var(--danger);
   animation: pulse 1.2s infinite;
-  box-shadow: 0 0 0 12px rgba(255, 82, 119, 0.16);
+  box-shadow: 0 0 0 10px rgba(220, 38, 38, 0.14);
 }
 
 @keyframes pulse {
@@ -140,7 +140,7 @@ h1 {
 
 .recorder-card {
   padding: 28px;
-  border-radius: 34px;
+  border-radius: 26px;
 }
 
 .meter-wrap {
@@ -148,8 +148,8 @@ h1 {
   overflow: hidden;
   min-height: 180px;
   border: 1px solid var(--border);
-  border-radius: 26px;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  border-radius: 22px;
+  background: linear-gradient(135deg, #f8fbff, #eef4fb);
 }
 
 #levelMeter {
@@ -165,7 +165,8 @@ h1 {
   padding: 10px 14px;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.28);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 10px 24px rgba(32, 45, 72, 0.1);
   font-variant-numeric: tabular-nums;
   font-weight: 800;
 }
@@ -177,7 +178,7 @@ h1 {
   margin: 24px 0 0;
   padding: 18px;
   border: 1px solid var(--border);
-  border-radius: 22px;
+  border-radius: 18px;
   background: var(--card-strong);
 }
 
@@ -197,9 +198,20 @@ h1 {
   align-items: start;
   padding: 14px;
   border: 1px solid var(--border);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.055);
+  border-radius: 14px;
+  background: #ffffff;
   cursor: pointer;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.source-picker label:hover,
+.source-picker label:has(input:checked) {
+  border-color: rgba(37, 99, 235, 0.45);
+  box-shadow: 0 10px 24px rgba(32, 45, 72, 0.08);
+}
+
+.source-picker label:has(input:checked) {
+  background: #f8fbff;
 }
 
 .source-picker input {
@@ -243,8 +255,8 @@ h1 {
   min-height: 48px;
   padding: 0 20px;
   border: 0;
-  border-radius: 999px;
-  color: var(--text);
+  border-radius: 12px;
+  color: #ffffff;
   font-weight: 800;
   text-decoration: none;
   cursor: pointer;
@@ -261,31 +273,32 @@ h1 {
 }
 
 .primary {
-  background: linear-gradient(135deg, var(--accent), #9d7cff);
-  box-shadow: 0 14px 34px rgba(124, 92, 255, 0.36);
+  background: linear-gradient(135deg, var(--accent), #1d4ed8);
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.22);
 }
 
 .danger {
-  background: linear-gradient(135deg, var(--danger), #ff8a5c);
-  box-shadow: 0 14px 34px rgba(255, 82, 119, 0.28);
+  background: linear-gradient(135deg, var(--danger), #b91c1c);
+  box-shadow: 0 14px 28px rgba(220, 38, 38, 0.18);
 }
 
 .secondary {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--border);
+  color: var(--accent);
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
 }
 
 .notice,
 .save-info {
-  border-radius: 22px;
+  border-radius: 18px;
   padding: 18px;
 }
 
 .error {
   margin-bottom: 18px;
-  color: #ffdfe6;
+  color: #991b1b;
   background: var(--warning-bg);
-  border: 1px solid rgba(255, 82, 119, 0.38);
+  border: 1px solid #fecaca;
 }
 
 .save-info {
@@ -305,7 +318,7 @@ h1 {
 .recordings {
   margin-top: 24px;
   padding: 28px;
-  border-radius: 34px;
+  border-radius: 26px;
 }
 
 .section-heading {
@@ -332,8 +345,8 @@ h1 {
 
 .empty-state,
 .recording-item {
-  border: 1px dashed var(--border);
-  border-radius: 22px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 18px;
   padding: 18px;
 }
 
@@ -349,7 +362,7 @@ h1 {
   gap: 16px;
   align-items: center;
   border-style: solid;
-  background: rgba(255, 255, 255, 0.055);
+  background: #ffffff;
 }
 
 .recording-item h3,
