@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BrowserRecord – Soundaufnahme</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero" aria-labelledby="app-title">
+        <div>
+          <p class="eyebrow">BrowserRecord</p>
+          <h1 id="app-title">Soundaufnahme direkt im Browser</h1>
+          <p class="lead">
+            Nimm Audio über dein Mikrofon auf, höre es sofort an und speichere es als Datei.
+            Deine Aufnahme bleibt lokal in deinem Browser – es wird nichts hochgeladen.
+          </p>
+        </div>
+        <div class="status-card" aria-live="polite">
+          <span class="pulse" id="recordingPulse" aria-hidden="true"></span>
+          <div>
+            <p class="status-label">Status</p>
+            <p class="status-value" id="statusText">Bereit für die Aufnahme</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="recorder-card" aria-label="Aufnahmewerkzeug">
+        <div class="meter-wrap">
+          <canvas id="levelMeter" width="720" height="120" aria-label="Audio-Pegelanzeige"></canvas>
+          <div class="timer" id="timer">00:00</div>
+        </div>
+
+        <div class="controls">
+          <button class="button primary" id="startButton" type="button">Aufnahme starten</button>
+          <button class="button danger" id="stopButton" type="button" disabled>Aufnahme stoppen</button>
+        </div>
+
+        <div class="notice error" id="errorBox" role="alert" hidden></div>
+
+        <article class="save-info">
+          <h2>Speicherort</h2>
+          <p id="saveLocation">
+            Noch keine Aufnahme vorhanden. Nach dem Speichern landet die Audiodatei in dem Download-Ordner,
+            den dein Browser verwendet.
+          </p>
+          <p class="hint">
+            Tipp: In Chrome, Edge und Firefox kannst du den genauen Download-Ordner in den Browser-Einstellungen
+            unter „Downloads“ sehen oder ändern.
+          </p>
+        </article>
+      </section>
+
+      <section class="recordings" aria-labelledby="recordings-title">
+        <div class="section-heading">
+          <h2 id="recordings-title">Aufnahmen</h2>
+          <span id="recordingCount">0 Dateien</span>
+        </div>
+        <div id="recordingsList" class="recordings-list">
+          <p class="empty-state">Starte eine Aufnahme, um hier deine Audiodateien zu sehen.</p>
+        </div>
+      </section>
+    </main>
+
+    <template id="recordingTemplate">
+      <article class="recording-item">
+        <div>
+          <h3></h3>
+          <p class="recording-meta"></p>
+        </div>
+        <audio controls></audio>
+        <a class="button secondary" download>Speichern</a>
+      </article>
+    </template>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
