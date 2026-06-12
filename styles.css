@@ -170,6 +170,65 @@ h1 {
   font-weight: 800;
 }
 
+
+.source-picker {
+  display: grid;
+  gap: 14px;
+  margin: 24px 0 0;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--card-strong);
+}
+
+.source-picker legend {
+  padding: 0 8px;
+  color: var(--accent-2);
+  font-size: 0.82rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.source-picker label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.055);
+  cursor: pointer;
+}
+
+.source-picker input {
+  width: 18px;
+  height: 18px;
+  margin-top: 3px;
+  accent-color: var(--accent-2);
+}
+
+.source-picker input:disabled + span {
+  opacity: 0.55;
+}
+
+.source-picker strong,
+.source-picker small {
+  display: block;
+}
+
+.source-picker small {
+  margin-top: 4px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.source-picker .hint {
+  margin-bottom: 0;
+  line-height: 1.55;
+}
+
 .controls {
   display: flex;
   flex-wrap: wrap;

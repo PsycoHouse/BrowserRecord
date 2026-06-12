@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>BrowserRecord – Soundaufnahme</title>
+    <title>BrowserRecord – Meeting- und Soundaufnahme</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -11,10 +11,10 @@
       <section class="hero" aria-labelledby="app-title">
         <div>
           <p class="eyebrow">BrowserRecord</p>
-          <h1 id="app-title">Soundaufnahme direkt im Browser</h1>
+          <h1 id="app-title">Meetings, Tabs und Mikrofon aufnehmen</h1>
           <p class="lead">
-            Nimm Audio über dein Mikrofon auf, höre es sofort an und speichere es als Datei.
-            Deine Aufnahme bleibt lokal in deinem Browser – es wird nichts hochgeladen.
+            Nimm Audio über dein Mikrofon, aus einem Browser-Tab oder aus einem Meeting auf,
+            höre es sofort an und speichere es als Datei. Deine Aufnahme bleibt lokal in deinem Browser – es wird nichts hochgeladen.
           </p>
         </div>
         <div class="status-card" aria-live="polite">
@@ -31,6 +31,35 @@
           <canvas id="levelMeter" width="720" height="120" aria-label="Audio-Pegelanzeige"></canvas>
           <div class="timer" id="timer">00:00</div>
         </div>
+
+        <fieldset class="source-picker" aria-describedby="sourceHelp">
+          <legend>Audioquelle</legend>
+          <label>
+            <input type="radio" name="audioSource" value="microphone" checked />
+            <span>
+              <strong>Mikrofon</strong>
+              <small>Für Sprache direkt über dein Eingabegerät.</small>
+            </span>
+          </label>
+          <label>
+            <input type="radio" name="audioSource" value="tab" />
+            <span>
+              <strong>Tab, Fenster oder Systemaudio</strong>
+              <small>Für YouTube, Meetings oder andere Browser-Tabs.</small>
+            </span>
+          </label>
+          <label>
+            <input type="radio" name="audioSource" value="tab-microphone" />
+            <span>
+              <strong>Tab/Systemaudio + Mikrofon</strong>
+              <small>Nimmt z. B. ein Meeting und deine eigene Stimme gemeinsam auf.</small>
+            </span>
+          </label>
+          <p class="hint" id="sourceHelp">
+            Wähle bei Tab-Aufnahmen im Browser-Dialog einen Tab mit aktivierter Audiofreigabe. Je nach Browser heißt die Option
+            „Tab-Audio teilen“, „Systemaudio freigeben“ oder ähnlich.
+          </p>
+        </fieldset>
 
         <div class="controls">
           <button class="button primary" id="startButton" type="button">Aufnahme starten</button>
