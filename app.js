@@ -57,7 +57,7 @@ function updateTimer() {
 function drawIdleMeter() {
   const { width, height } = levelMeter;
   canvasContext.clearRect(0, 0, width, height);
-  canvasContext.fillStyle = 'rgba(255, 255, 255, 0.08)';
+  canvasContext.fillStyle = 'rgba(37, 99, 235, 0.14)';
 
   for (let i = 0; i < 34; i += 1) {
     const barHeight = 14 + Math.sin(i * 0.8) * 8;
@@ -79,8 +79,8 @@ function drawLiveMeter() {
   canvasContext.clearRect(0, 0, width, height);
 
   const gradient = canvasContext.createLinearGradient(0, 0, width, 0);
-  gradient.addColorStop(0, '#7c5cff');
-  gradient.addColorStop(1, '#26d9c5');
+  gradient.addColorStop(0, '#2563eb');
+  gradient.addColorStop(1, '#0f766e');
   canvasContext.fillStyle = gradient;
 
   const barWidth = width / 64;
