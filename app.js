@@ -9,10 +9,12 @@ const levelMeter = document.querySelector('#levelMeter');
 const recordingsList = document.querySelector('#recordingsList');
 const recordingCount = document.querySelector('#recordingCount');
 const recordingTemplate = document.querySelector('#recordingTemplate');
+const audioSourceInputs = document.querySelectorAll('input[name="audioSource"]');
 
 const canvasContext = levelMeter.getContext('2d');
 let mediaRecorder;
 let audioStream;
+let displayStream;
 let audioContext;
 let analyser;
 let animationFrameId;
@@ -35,6 +37,9 @@ function setRecordingUi(isRecording) {
   startButton.disabled = isRecording;
   stopButton.disabled = !isRecording;
   recordingPulse.classList.toggle('recording', isRecording);
+  audioSourceInputs.forEach((input) => {
+    input.disabled = isRecording;
+  });
   statusText.textContent = isRecording ? 'Aufnahme läuft …' : 'Bereit für die Aufnahme';
 }
 
@@ -99,9 +104,15 @@ function getFileExtension(mimeType) {
   return 'webm';
 }
 
-function createFilename(extension) {
+function createFilename(extension, sourceType) {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  return `browserrecord-${timestamp}.${extension}`;
+  const sourceLabel = {
+    microphone: 'mikrofon',
+    tab: 'tab-audio',
+    'tab-microphone': 'tab-und-mikrofon',
+  }[sourceType] || 'aufnahme';
+
+  return `browserrecord-${sourceLabel}-${timestamp}.${extension}`;
 }
 
 function humanFileSize(bytes) {
@@ -142,9 +153,15 @@ function updateRecordingsList() {
   });
 }
 
+function stopStreamTracks(stream) {
+  stream?.getTracks().forEach((track) => track.stop());
+}
+
 function stopAudioTracks() {
-  audioStream?.getTracks().forEach((track) => track.stop());
+  stopStreamTracks(audioStream);
+  stopStreamTracks(displayStream);
   audioStream = undefined;
+  displayStream = undefined;
 }
 
 function stopVisuals() {
@@ -156,11 +173,64 @@ function stopVisuals() {
   drawIdleMeter();
 }
 
+function getSelectedSourceType() {
+  return document.querySelector('input[name="audioSource"]:checked')?.value || 'microphone';
+}
+
+function ensureAudioTracks(stream, sourceType) {
+  if (stream.getAudioTracks().length > 0) return;
+
+  stopStreamTracks(stream);
+
+  if (sourceType === 'microphone') {
+    throw new Error('Es wurde kein Mikrofon-Audiosignal gefunden.');
+  }
+
+  throw new Error('Die ausgewählte Freigabe enthält kein Audiosignal. Wähle im Browser-Dialog einen Tab oder Bildschirm mit aktivierter Audiofreigabe.');
+}
+
+async function getDisplayAudioStream() {
+  if (!navigator.mediaDevices?.getDisplayMedia) {
+    throw new Error('Dein Browser unterstützt keine Tab-, Fenster- oder Systemaudio-Aufnahme. Bitte nutze eine aktuelle Version von Chrome oder Edge.');
+  }
+
+  const stream = await navigator.mediaDevices.getDisplayMedia({
+    video: true,
+    audio: {
+      echoCancellation: false,
+      noiseSuppression: false,
+      autoGainControl: false,
+    },
+  });
+
+  ensureAudioTracks(stream, 'tab');
+  return stream;
+}
+
+function createRecorderStream(sourceType) {
+  audioContext = new AudioContextConstructor();
+  analyser = audioContext.createAnalyser();
+  analyser.fftSize = 128;
+
+  const destination = audioContext.createMediaStreamDestination();
+  const streamsToMix = sourceType === 'tab-microphone' ? [displayStream, audioStream] : [audioStream || displayStream];
+
+  streamsToMix.forEach((stream) => {
+    const source = audioContext.createMediaStreamSource(stream);
+    source.connect(analyser);
+    source.connect(destination);
+  });
+
+  return destination.stream;
+}
+
+const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
+
 async function startRecording() {
   clearError();
 
-  if (!navigator.mediaDevices?.getUserMedia) {
-    showError('Dein Browser unterstützt keine Mikrofonaufnahme. Bitte nutze eine aktuelle Version von Chrome, Edge, Firefox oder Safari.');
+  if (!navigator.mediaDevices) {
+    showError('Dein Browser unterstützt keine Audioaufnahme. Bitte nutze eine aktuelle Version von Chrome, Edge, Firefox oder Safari.');
     return;
   }
 
@@ -169,10 +239,32 @@ async function startRecording() {
     return;
   }
 
+  if (!AudioContextConstructor) {
+    showError('AudioContext wird von diesem Browser nicht unterstützt. Bitte aktualisiere deinen Browser oder wechsle zu einem unterstützten Browser.');
+    return;
+  }
+
+  const sourceType = getSelectedSourceType();
+
+  if ((sourceType === 'microphone' || sourceType === 'tab-microphone') && !navigator.mediaDevices.getUserMedia) {
+    showError('Dein Browser unterstützt keine Mikrofonaufnahme. Bitte nutze eine aktuelle Version von Chrome, Edge, Firefox oder Safari.');
+    return;
+  }
+
   try {
-    audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    if (sourceType === 'microphone' || sourceType === 'tab-microphone') {
+      audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      ensureAudioTracks(audioStream, 'microphone');
+    }
+
+    if (sourceType === 'tab' || sourceType === 'tab-microphone') {
+      statusText.textContent = 'Warte auf Tab- oder Systemaudio-Freigabe …';
+      displayStream = await getDisplayAudioStream();
+    }
+
+    const recorderStream = createRecorderStream(sourceType);
     const mimeType = getSupportedMimeType();
-    mediaRecorder = new MediaRecorder(audioStream, mimeType ? { mimeType } : undefined);
+    mediaRecorder = new MediaRecorder(recorderStream, mimeType ? { mimeType } : undefined);
     audioChunks = [];
 
     mediaRecorder.addEventListener('dataavailable', (event) => {
@@ -181,18 +273,11 @@ async function startRecording() {
       }
     });
 
-    mediaRecorder.addEventListener('stop', handleRecordingStop, { once: true });
+    mediaRecorder.addEventListener('stop', () => handleRecordingStop(sourceType), { once: true });
 
-    const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextConstructor) {
-      throw new Error('AudioContext wird von diesem Browser nicht unterstützt.');
-    }
-
-    audioContext = new AudioContextConstructor();
-    const source = audioContext.createMediaStreamSource(audioStream);
-    analyser = audioContext.createAnalyser();
-    analyser.fftSize = 128;
-    source.connect(analyser);
+    displayStream?.getAudioTracks().forEach((track) => {
+      track.addEventListener('ended', () => stopRecording(), { once: true });
+    });
 
     recordingStartedAt = Date.now();
     timerIntervalId = window.setInterval(updateTimer, 250);
@@ -206,11 +291,11 @@ async function startRecording() {
     setRecordingUi(false);
 
     if (error.name === 'NotAllowedError') {
-      showError('Mikrofonzugriff wurde verweigert. Erlaube den Zugriff in der Adressleiste oder in den Website-Einstellungen und versuche es erneut.');
+      showError('Der Zugriff wurde verweigert. Erlaube Mikrofon- oder Tab-Audio in der Browser-Abfrage und versuche es erneut.');
     } else if (error.name === 'NotFoundError') {
-      showError('Es wurde kein Mikrofon gefunden. Schließe ein Mikrofon an oder prüfe die Systemeinstellungen.');
+      showError('Es wurde kein passendes Audiogerät oder keine Audiofreigabe gefunden. Prüfe Mikrofon, Tab-Audio und Systemeinstellungen.');
     } else if (error.name === 'NotReadableError') {
-      showError('Das Mikrofon kann gerade nicht verwendet werden. Schließe andere Apps, die das Mikrofon benutzen, und versuche es erneut.');
+      showError('Die Audioquelle kann gerade nicht verwendet werden. Schließe andere Apps, die sie benutzen, und versuche es erneut.');
     } else {
       showError(`Die Aufnahme konnte nicht gestartet werden: ${error.message || 'Unbekannter Fehler'}`);
     }
@@ -224,11 +309,11 @@ function stopRecording() {
   }
 }
 
-function handleRecordingStop() {
+function handleRecordingStop(sourceType) {
   const mimeType = mediaRecorder.mimeType || 'audio/webm';
   const blob = new Blob(audioChunks, { type: mimeType });
   const extension = getFileExtension(mimeType);
-  const filename = createFilename(extension);
+  const filename = createFilename(extension, sourceType);
   const url = URL.createObjectURL(blob);
   const duration = formatDuration(Date.now() - recordingStartedAt);
 
